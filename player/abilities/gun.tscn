@@ -1,0 +1,80 @@
+[gd_scene load_steps=4 format=3 uid="uid://315i65rawuo1"]
+
+[sub_resource type="GDScript" id="GDScript_w0cel"]
+script/source = "extends Node2D
+
+func a():
+	if $point1/point2/RayCast2D.is_colliding():
+		var a : Node2D = $point1/point2/RayCast2D.get_collider()
+		if a.has_method(\"damage\"):
+			a.damage(20)
+	pass
+
+func  _process(_delta):
+	$point1/point2.look_at(get_global_mouse_position())
+
+func _on_timer_timeout():
+	if owner.health <= 0: return
+	$point1/point2/AnimationPlayer.play(\"fire\")
+	
+	pass # Replace with function body.
+"
+
+[sub_resource type="Animation" id="Animation_lq3m1"]
+resource_name = "fire"
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("point1/point2/Polygon2D:scale:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 4.5, -0.2, -2, 0.25, 0, 0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.162396, 0.6)
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.113919),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"a"
+}]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_aiqby"]
+_data = {
+"fire": SubResource("Animation_lq3m1")
+}
+
+[node name="gun" type="Node2D"]
+script = SubResource("GDScript_w0cel")
+
+[node name="point1" type="Node2D" parent="."]
+
+[node name="point2" type="Node2D" parent="point1"]
+
+[node name="Polygon2D" type="Polygon2D" parent="point1/point2"]
+position = Vector2(2.11207, 0)
+scale = Vector2(3.84895, 1)
+polygon = PackedVector2Array(-1, -6, 115, -6, 114, 10, -1, 10)
+
+[node name="RayCast2D" type="RayCast2D" parent="point1/point2"]
+target_position = Vector2(353, 1)
+
+[node name="Timer" type="Timer" parent="point1/point2/RayCast2D"]
+autostart = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="point1/point2"]
+root_node = NodePath("../../..")
+libraries = {
+"": SubResource("AnimationLibrary_aiqby")
+}
+
+[connection signal="timeout" from="point1/point2/RayCast2D/Timer" to="." method="_on_timer_timeout"]

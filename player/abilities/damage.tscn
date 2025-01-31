@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3 uid="uid://b3f80asd4up32"]
+
+[sub_resource type="GDScript" id="GDScript_gyplo"]
+script/source = "extends Node2D
+
+
+@export var R = 10
+@export var amount = 20
+
+func _process(_delta):
+	$StaticBody2D/CollisionShape2D.shape.radius = R
+
+
+func _on_static_body_2d_body_entered(body):
+	if body is Node2D:
+		if body.has_method(\"damage\"):
+			body.damage(amount)
+	pass
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_aa188"]
+radius = 109.16
+
+[node name="damage" type="Node2D"]
+script = SubResource("GDScript_gyplo")
+
+[node name="StaticBody2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("CircleShape2D_aa188")
+
+[connection signal="body_entered" from="StaticBody2D" to="." method="_on_static_body_2d_body_entered"]

@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://l6ju663f3au0"]
+
+[ext_resource type="PackedScene" uid="uid://bajod88rowpoh" path="res://player/player.tscn" id="1_8l0lk"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_fn6li"]
+viewport_path = NodePath("Icon/SubViewport")
+
+[node name="player" instance=ExtResource("1_8l0lk")]
+
+[node name="Icon" parent="." index="7"]
+texture = SubResource("ViewportTexture_fn6li")

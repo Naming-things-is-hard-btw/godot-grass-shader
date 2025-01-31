@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3 uid="uid://boonk74nj4551"]
+
+[sub_resource type="Shader" id="Shader_a3rld"]
+code = "shader_type canvas_item;
+
+uniform sampler2D screentex : hint_screen_texture;
+uniform int pixelscale = 4;
+
+void fragment()
+{
+	ivec2 texture_size = textureSize(screentex, 0);
+	vec2 factor = vec2(texture_size) / float(pixelscale);
+	vec2 snapped_uv = floor(SCREEN_UV * factor) / factor;
+
+	vec4 c = textureLod(screentex, snapped_uv, 0);
+
+	if (c.a > 0.0001) {
+		c.rgb /= c.a;
+	}
+	COLOR *= c;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2u5l4"]
+shader = SubResource("Shader_a3rld")
+shader_parameter/pixelscale = 14
+
+[sub_resource type="Gradient" id="Gradient_3olyg"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ckqme"]
+gradient = SubResource("Gradient_3olyg")
+
+[node name="blur" type="Sprite2D"]
+material = SubResource("ShaderMaterial_2u5l4")
+position = Vector2(905, -118)
+scale = Vector2(5.215, 1.95)
+texture = SubResource("GradientTexture2D_ckqme")

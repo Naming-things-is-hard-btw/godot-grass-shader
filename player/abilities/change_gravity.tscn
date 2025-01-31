@@ -1,0 +1,74 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2voihm4dfhho"]
+
+[sub_resource type="GDScript" id="GDScript_d1wpq"]
+script/source = "extends Node
+
+
+@export var level = 0
+func gravity_up():
+	owner.gravity_vec = Vector2( 0, -1)
+	owner.target_rotation = 180
+func gravity_down():
+	owner.gravity_vec = Vector2( 0, 1)
+	owner.target_rotation = 0
+func gravity_left():
+	owner.gravity_vec = Vector2( -1, 0)
+	owner.target_rotation = 90
+func gravity_right():
+	owner.gravity_vec = Vector2( 1, 0)
+	owner.target_rotation = -90
+
+func gravity_relative_Right():
+	if owner.up_direction == Vector2(1,0):
+		gravity_down()
+	if owner.up_direction == Vector2(-1,0):
+		gravity_up()
+	if owner.up_direction == Vector2(0,-1):
+		gravity_right()
+	if owner.up_direction == Vector2(0,1):
+		gravity_left()
+	owner.up_direction = -owner.gravity_vec
+
+func gravity_relative_Left():
+	if owner.up_direction == Vector2(-1,0):
+		gravity_down()
+	if owner.up_direction == Vector2(1,0):
+			gravity_up()
+	if owner.up_direction == Vector2(0,1):
+		gravity_right()
+	if owner.up_direction == Vector2(0,-1):
+		gravity_left()
+	owner.up_direction = -owner.gravity_vec
+
+func gravity_relative_Up():
+	if owner.up_direction == Vector2(0,1):
+		gravity_down()
+	if owner.up_direction == Vector2(0,-1):
+		gravity_up()
+	if owner.up_direction == Vector2(1,0):
+		gravity_right()
+	if owner.up_direction == Vector2(-1,0):
+		gravity_left()
+	owner.up_direction = -owner.gravity_vec
+
+func handleInput():
+	if Input.is_action_just_pressed(\"gup\"):
+		gravity_relative_Up()
+	if level < 1 : return
+	if Input.is_action_just_pressed(\"gright\"):
+		gravity_relative_Right()
+	if Input.is_action_just_pressed(\"gleft\"):
+		gravity_relative_Left()
+	pass
+
+@export var enabled = true
+func _process(delta):
+	if not enabled: return
+	if owner.dead: return
+	handleInput()
+	owner.rotation = lerp_angle(owner.rotation,deg_to_rad(owner.target_rotation), 4 * delta)
+	pass
+"
+
+[node name="ChangeGravity" type="Node"]
+script = SubResource("GDScript_d1wpq")

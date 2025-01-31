@@ -1,0 +1,143 @@
+[gd_scene load_steps=13 format=3 uid="uid://bajod88rowpoh"]
+
+[ext_resource type="PackedScene" uid="uid://c2voihm4dfhho" path="res://player/abilities/change_gravity.tscn" id="2_8qaoy"]
+[ext_resource type="PackedScene" uid="uid://dtpk6adh1ajd8" path="res://player/abilities/wall_jump.tscn" id="3_364np"]
+[ext_resource type="PackedScene" uid="uid://isodcyethfo2" path="res://player/abilities/jump.tscn" id="4_s5vtw"]
+[ext_resource type="PackedScene" uid="uid://cuhprha8pm7bu" path="res://player/abilities/slow_motion.tscn" id="5_kbd8p"]
+[ext_resource type="PackedScene" uid="uid://g6m57nc2sy8h" path="res://player/ui/dialog.tscn" id="5_s2glm"]
+[ext_resource type="PackedScene" uid="uid://c0mctvny45oc2" path="res://player/ui/health.tscn" id="6_ocnuq"]
+[ext_resource type="Texture2D" uid="uid://lpvxe34fjlx6" path="res://icon.svg" id="7_8w4l3"]
+
+[sub_resource type="GDScript" id="GDScript_tsgbl"]
+script/source = "extends CharacterBody2D
+
+
+const SPEED = 300.0
+const JUMP_VELOCITY = -500.0
+
+var health = 100
+var lives = 3
+var dead = false
+var canMove = true
+
+signal on_damage(new_health)
+signal on_death()
+
+func die():
+	dead = true
+	on_death.emit()
+	get_tree().quit()
+	pass
+
+func damage(amount):
+	health -= amount
+	if health <= 0: die()
+	on_damage.emit(health)
+
+
+
+# Get the gravity from the project settings to be synced with RigidBody nodes.
+var gravity = ProjectSettings.get_setting(\"physics/2d/default_gravity\")
+var gravity_vec = Vector2( 0, 1 )
+var target_rotation = 0
+
+func _physics_process(delta):
+	#gravity
+	if not is_on_floor():
+		velocity += gravity_vec * gravity * delta
+	
+	#quit
+	if Input.is_action_pressed(\"quit\"):
+		get_tree().quit()
+	
+	#movement
+	handle_movement()
+	move_and_slide()
+
+#shitty old code i will improve later
+func handle_movement():
+	if dead: return
+	if not canMove: return
+	var direction = Input.get_axis(\"left\", \"right\")
+	if up_direction == Vector2(0,-1):
+		if is_on_floor(): velocity.x = move_toward(velocity.x, SPEED * direction, SPEED/10.0)
+		if not is_on_floor(): velocity.x =  move_toward(velocity.x, SPEED * direction, SPEED/70.0)
+	if up_direction == Vector2(0,1):
+		if is_on_floor(): velocity.x = move_toward(velocity.x, -SPEED * direction, SPEED/10.0)
+		if not is_on_floor(): velocity.x =  move_toward(velocity.x, -SPEED * direction, SPEED/70.0)
+	if up_direction == Vector2(1,0):
+		if is_on_floor(): velocity.y = move_toward(velocity.y, SPEED * direction, SPEED/10.0)
+		if not is_on_floor(): velocity.y =  move_toward(velocity.y, SPEED * direction, SPEED/70.0)
+	if up_direction == Vector2(-1,0):
+		if is_on_floor(): velocity.y = move_toward(velocity.y, -SPEED * direction, SPEED/10.0)
+		if not is_on_floor(): velocity.y =  move_toward(velocity.y, -SPEED * direction, SPEED/70.0)
+	
+"
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_w73mg"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+sky_energy_multiplier = 1.25
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_3ruaj"]
+sky_material = SubResource("ProceduralSkyMaterial_w73mg")
+
+[sub_resource type="Environment" id="Environment_hit5g"]
+background_color = Color(0.803922, 0.870588, 1, 1)
+sky = SubResource("Sky_3ruaj")
+ambient_light_source = 2
+ambient_light_color = Color(0, 0.392157, 0.380392, 1)
+tonemap_mode = 2
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_uuj5u"]
+radius = 21.0
+height = 98.0
+
+[node name="player" type="CharacterBody2D"]
+floor_constant_speed = true
+floor_max_angle = 1.51669
+floor_snap_length = 10.0
+script = SubResource("GDScript_tsgbl")
+
+[node name="WorldEnvironment2" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_hit5g")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866024, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.75, -0.43301, 0, 0, 0)
+shadow_enabled = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_uuj5u")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, -50)
+ignore_rotation = false
+position_smoothing_enabled = true
+position_smoothing_speed = 3.0
+rotation_smoothing_enabled = true
+rotation_smoothing_speed = 7.0
+
+[node name="Ability" type="Node2D" parent="."]
+
+[node name="ChangeGravity" parent="Ability" instance=ExtResource("2_8qaoy")]
+level = 1
+
+[node name="WallJump" parent="Ability" instance=ExtResource("3_364np")]
+
+[node name="jump" parent="Ability" instance=ExtResource("4_s5vtw")]
+
+[node name="SlowMotion" parent="Ability" instance=ExtResource("5_kbd8p")]
+
+[node name="health" parent="." instance=ExtResource("6_ocnuq")]
+visible = false
+offset_top = -92.0
+offset_bottom = -65.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="dialog" parent="CanvasLayer" instance=ExtResource("5_s2glm")]
+
+[node name="Icon" type="Sprite2D" parent="."]
+position = Vector2(0.5, -1)
+scale = Vector2(0.335938, 0.765625)
+texture = ExtResource("7_8w4l3")

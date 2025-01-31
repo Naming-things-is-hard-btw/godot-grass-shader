@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://dtpk6adh1ajd8"]
+
+[sub_resource type="GDScript" id="GDScript_o234j"]
+script/source = "extends Node
+
+@export var enabled = true
+func _process(_delta):
+	if not enabled: return
+	if owner.dead: return
+	if Input.is_action_just_pressed(\"up\") and owner.is_on_wall_only():
+		owner.velocity += owner.gravity_vec * owner.JUMP_VELOCITY
+		owner.velocity += owner.get_wall_normal() * 300
+	if not owner.is_on_floor():
+		if owner.is_on_wall_only():
+			owner.velocity = owner.velocity * 0.7
+"
+
+[node name="WallJump" type="Node"]
+script = SubResource("GDScript_o234j")

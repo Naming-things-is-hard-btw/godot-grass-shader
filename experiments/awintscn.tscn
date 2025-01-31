@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3 uid="uid://10kn3y1ww610"]
+
+[ext_resource type="Texture2D" uid="uid://lpvxe34fjlx6" path="res://icon.svg" id="1_byvm0"]
+
+[sub_resource type="GDScript" id="GDScript_ic4tl"]
+script/source = "extends Window
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(_delta):
+	position = $\"..\".get_global_transform_with_canvas().get_origin()# + (Vector2)($\"..\".get_window().position)
+	
+	pass
+"
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Icon" type="Sprite2D" parent="."]
+position = Vector2(70, 70)
+texture = ExtResource("1_byvm0")
+
+[node name="Window" type="Window" parent="."]
+position = Vector2i(0, 36)
+size = Vector2i(370, 130)
+unresizable = true
+always_on_top = true
+script = SubResource("GDScript_ic4tl")

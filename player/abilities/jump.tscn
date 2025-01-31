@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://isodcyethfo2"]
+
+[sub_resource type="GDScript" id="GDScript_uyotv"]
+script/source = "extends Node2D
+
+@export var enabled = true
+func _process(_delta):
+	if not enabled: return
+	if owner.dead: return
+	if Input.is_action_just_pressed(\"up\") and owner.is_on_floor():
+		owner.velocity += owner.gravity_vec * owner.JUMP_VELOCITY
+		$jumpparticles.emitting = true
+"
+
+[node name="jump" type="Node2D"]
+script = SubResource("GDScript_uyotv")
+
+[node name="jumpparticles" type="CPUParticles2D" parent="."]
+position = Vector2(0, 28)
+emitting = false
+amount = 28
+lifetime = 0.5
+one_shot = true
+explosiveness = 0.51
+randomness = 0.9
+lifetime_randomness = 0.72
+emission_shape = 3
+emission_rect_extents = Vector2(12.545, 1)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 23.26
+initial_velocity_max = 124.03

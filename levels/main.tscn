@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://tg4n63ijxbub"]
+
+[ext_resource type="PackedScene" uid="uid://ftftx5u8f62l" path="res://experiments/node_2d.tscn" id="1_omwxj"]
+[ext_resource type="PackedScene" uid="uid://bajod88rowpoh" path="res://player/player.tscn" id="2_ckof0"]
+
+[sub_resource type="Gradient" id="Gradient_ylyke"]
+offsets = PackedFloat32Array(0.19186, 0.651163)
+colors = PackedColorArray(1, 1, 1, 0.4, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_5d1ko"]
+gradient = SubResource("Gradient_ylyke")
+fill = 1
+fill_from = Vector2(0.495726, 0.492877)
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Node2D" parent="." instance=ExtResource("1_omwxj")]
+position = Vector2(56, 102)
+
+[node name="player2" parent="." instance=ExtResource("2_ckof0")]
+position = Vector2(-126, -62)
+
+[node name="PointLight2D" type="Sprite2D" parent="player2"]
+visible = false
+scale = Vector2(5.84375, 5.96875)
+texture = SubResource("GradientTexture2D_5d1ko")

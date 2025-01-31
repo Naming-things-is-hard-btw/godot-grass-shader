@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=3 uid="uid://cuhprha8pm7bu"]
+
+[sub_resource type="GDScript" id="GDScript_t8bq2"]
+script/source = "extends Node
+
+
+@export var slow_motion_length = 2
+var target_zoom = 1.2
+
+@export var enabled = true
+func _process(delta):
+	if not enabled: return
+	if owner.dead: return
+	if Input.is_action_just_pressed(\"slow_motion\"):
+		Engine.time_scale = 0.2
+		$Timer.start(slow_motion_length * Engine.time_scale)
+		target_zoom = 1.6
+	var camera : Camera2D = owner.get_node(\"Camera2D\")
+	camera.zoom = lerp(camera.zoom, Vector2(target_zoom,target_zoom), 5 * delta)
+	pass
+
+
+func _on_timer_timeout():
+	Engine.time_scale = 1
+	target_zoom = 1
+"
+
+[node name="SlowMotion" type="Node"]
+script = SubResource("GDScript_t8bq2")
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
